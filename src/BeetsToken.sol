@@ -2,9 +2,10 @@
 pragma solidity ^0.8.22;
 
 import {ERC20} from "openzeppelin-contracts/token/ERC20/ERC20.sol";
+import {ERC20Permit} from "openzeppelin-contracts/token/ERC20/extensions/ERC20Permit.sol";
 import {Ownable} from "openzeppelin-contracts/access/Ownable.sol";
 
-contract Beets is ERC20, Ownable {
+contract Beets is ERC20, ERC20Permit, Ownable {
     uint256 public constant YEAR_IN_SECONDS = 365 days;
     // 10% per year is the hardcoded max inflation rate, as defined in BIP-##
     uint256 public constant MAX_INFLATION_PER_YEAR = 1e17;
@@ -26,6 +27,7 @@ contract Beets is ERC20, Ownable {
 
     constructor(uint256 _initialSupply)
         ERC20("Beets", "BEETS")
+        ERC20Permit("Beets")
         Ownable(msg.sender)
     {
         _mint(msg.sender, _initialSupply);
