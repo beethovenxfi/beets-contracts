@@ -35,6 +35,7 @@ contract BeetsTest is Test {
         assertEq(beetsToken.amountMintedCurrentYear(), 0);
         assertEq(beetsToken.getMaxAllowedSupplyCurrentYear(), 220_000_000 ether);
         assertEq(beetsToken.balanceOf(TOKEN_MINTER_TARGET), INITIAL_SUPPLY);
+        assertEq(beetsToken.getEndTimestampCurrentYear(), block.timestamp + 365 days);
     }
 
     function testConstructorErrorZeroSupply() public {
@@ -149,5 +150,18 @@ contract BeetsTest is Test {
         assertEq(beetsToken.startTimestampCurrentYear(), block.timestamp - 1);
         assertEq(beetsToken.amountMintedCurrentYear(), 0);
         assertEq(beetsToken.startingSupplyCurrentYear(), INITIAL_SUPPLY);
+    }
+
+    function testIncrementYearNotEndedError() public {
+        vm.warp(block.timestamp + 364 days);
+
+        vm.prank(TOKEN_MINTER_ADDRESS);
+        vm.expectRevert(abi.encodeWithSelector(Beets.CurrentYearHasNotEnded.selector));
+        beetsToken.incrementYear();
+    }
+
+    function testIncrementYearUnauthorized() public {
+        vm.expectRevert(abi.encodeWithSelector(OwnableUnauthorizedAccount.selector, address(this)));
+        beetsToken.incrementYear();
     }
 }
