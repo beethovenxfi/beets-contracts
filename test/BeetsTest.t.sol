@@ -43,6 +43,8 @@ contract BeetsTest is Test {
 
         assertEq(beetsToken.balanceOf(TOKEN_MINTER_ADDRESS), amount);
         assertEq(beetsToken.amountMintedCurrentYear(), amount);
+        assertEq(beetsToken.totalSupply(), INITIAL_SUPPLY + amount);
+        assertEq(beetsToken.getMaxAllowedSupplyCurrentYear(), 220_000_000 ether);
     }
 
     function testMintUnAuthorized() public {
@@ -52,11 +54,55 @@ contract BeetsTest is Test {
         beetsToken.mint(TOKEN_MINTER_ADDRESS, amount);
     }
 
-    function testMintMaxInflationRateForCurrentYearReached() public {
+    function testMintCurrentYearEndedError() public {
+        uint256 amount = 1000 ether;
+
+        vm.warp(block.timestamp + 366 days);
+
+        vm.prank(TOKEN_MINTER_ADDRESS);
+        vm.expectRevert(abi.encodeWithSelector(Beets.CurrentYearEnded.selector));
+        beetsToken.mint(TOKEN_MINTER_ADDRESS, amount);
+    }
+
+    function testMintAmountTooHighError() public {
         uint256 amount = 20_000_001 ether;
 
         vm.prank(TOKEN_MINTER_ADDRESS);
         vm.expectRevert(abi.encodeWithSelector(Beets.MintAmountTooHigh.selector, MAX_MINTABLE_FIRST_YEAR));
         beetsToken.mint(TOKEN_MINTER_ADDRESS, amount);
+    }
+
+    function testMintInYearTwo() public {
+        uint256 maxAmountYearOne = 20_000_000 ether;
+        uint256 maxAmountYearTwo = 22_000_000 ether;
+
+        vm.prank(TOKEN_MINTER_ADDRESS);
+        beetsToken.mint(TOKEN_MINTER_ADDRESS, maxAmountYearOne);
+
+        assertEq(beetsToken.balanceOf(TOKEN_MINTER_ADDRESS), maxAmountYearOne);
+
+        vm.warp(block.timestamp + 366 days);
+        vm.prank(TOKEN_MINTER_ADDRESS);
+        beetsToken.incrementYear();
+
+        vm.prank(TOKEN_MINTER_ADDRESS);
+        beetsToken.mint(TOKEN_MINTER_ADDRESS, maxAmountYearTwo);
+
+        assertEq(beetsToken.balanceOf(TOKEN_MINTER_ADDRESS), maxAmountYearOne + maxAmountYearTwo);
+    }
+
+    function testMintInYearTwoNoFirstYearMints() public {
+        uint256 maxAmountYearTwo = 20_000_000 ether;
+
+        vm.warp(block.timestamp + 366 days);
+        vm.prank(TOKEN_MINTER_ADDRESS);
+        beetsToken.incrementYear();
+
+        vm.prank(TOKEN_MINTER_ADDRESS);
+        beetsToken.mint(TOKEN_MINTER_ADDRESS, maxAmountYearTwo);
+
+        assertEq(beetsToken.balanceOf(TOKEN_MINTER_ADDRESS), maxAmountYearTwo);
+        assertEq(beetsToken.totalSupply(), INITIAL_SUPPLY + maxAmountYearTwo);
+        assertEq(beetsToken.getMaxAllowedSupplyCurrentYear(), INITIAL_SUPPLY + maxAmountYearTwo);
     }
 }
