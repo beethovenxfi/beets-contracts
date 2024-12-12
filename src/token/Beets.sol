@@ -21,7 +21,7 @@ contract Beets is ERC20, ERC20Permit, Ownable {
     // minting cap such that no more than 10% of the starting supply can be minted during the current year.
     uint256 public startingSupplyCurrentYear;
 
-    error MaxInflationRateForCurrentYearReached();
+    error MintAmountTooHigh(uint256 remainingMintable);
     error CurrentYearHasNotEnded();
     error CurrentYearEnded();
 
@@ -45,8 +45,8 @@ contract Beets is ERC20, ERC20Permit, Ownable {
 
         amountMintedCurrentYear += amount;
 
-        if (amountMintedCurrentYear > getMaxAllowedSupplyCurrentYear()) {
-            revert MaxInflationRateForCurrentYearReached();
+        if (totalSupply() + amount > getMaxAllowedSupplyCurrentYear()) {
+            revert MintAmountTooHigh(getMaxAllowedSupplyCurrentYear() - totalSupply());
         }
 
         _mint(to, amount);
