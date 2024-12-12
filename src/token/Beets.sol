@@ -24,9 +24,18 @@ contract Beets is ERC20, ERC20Permit, Ownable {
     error MintAmountTooHigh(uint256 remainingMintable);
     error CurrentYearHasNotEnded();
     error CurrentYearEnded();
+    error InitialSupplyIsZero();
+    error InititalMintTargetIsZero();
 
-    constructor(uint256 _initialSupply) ERC20("Beets", "BEETS") ERC20Permit("Beets") Ownable(msg.sender) {
-        _mint(msg.sender, _initialSupply);
+    constructor(uint256 _initialSupply, address _initialMintTarget)
+        ERC20("Beets", "BEETS")
+        ERC20Permit("Beets")
+        Ownable(msg.sender)
+    {
+        require(_initialSupply > 0, InitialSupplyIsZero());
+        require(_initialMintTarget != address(0), InititalMintTargetIsZero());
+
+        _mint(_initialMintTarget, _initialSupply);
 
         // The current year starts at the deployment timestamp
         startTimestampCurrentYear = block.timestamp;

@@ -10,6 +10,7 @@ contract BeetsTest is Test {
     uint256 INITIAL_SUPPLY = 200_000_000 ether;
     uint256 MAX_MINTABLE_FIRST_YEAR = 20_000_000 ether;
     address TOKEN_MINTER_ADDRESS = 0xa1E849B1d6c2Fd31c63EEf7822e9E0632411ada7;
+    address TOKEN_MINTER_TARGET = vm.addr(1);
     Beets beetsToken;
 
     string SONIC_FORK_URL = "https://rpc.soniclabs.com";
@@ -22,7 +23,7 @@ contract BeetsTest is Test {
     function setUp() public {
         sonicFork = vm.createSelectFork(SONIC_FORK_URL, INITIAL_FORK_BLOCK_NUMBER);
 
-        beetsToken = new Beets(INITIAL_SUPPLY);
+        beetsToken = new Beets(INITIAL_SUPPLY, TOKEN_MINTER_TARGET);
         beetsToken.transferOwnership(TOKEN_MINTER_ADDRESS);
     }
 
@@ -33,6 +34,17 @@ contract BeetsTest is Test {
         assertEq(beetsToken.startingSupplyCurrentYear(), INITIAL_SUPPLY);
         assertEq(beetsToken.amountMintedCurrentYear(), 0);
         assertEq(beetsToken.getMaxAllowedSupplyCurrentYear(), 220_000_000 ether);
+        assertEq(beetsToken.balanceOf(TOKEN_MINTER_TARGET), INITIAL_SUPPLY);
+    }
+
+    function testConstructorErrorZeroSupply() public {
+        vm.expectRevert(abi.encodeWithSelector(Beets.InitialSupplyIsZero.selector));
+        new Beets(0, TOKEN_MINTER_TARGET);
+    }
+
+    function testConstructorErrorZeroMintTarget() public {
+        vm.expectRevert(abi.encodeWithSelector(Beets.InititalMintTargetIsZero.selector));
+        new Beets(INITIAL_SUPPLY, address(0));
     }
 
     function testMint() public {
