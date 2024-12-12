@@ -93,7 +93,7 @@ contract BeetsTest is Test {
 
         assertEq(beetsToken.balanceOf(TOKEN_MINTER_ADDRESS), maxAmountYearOne);
 
-        vm.warp(block.timestamp + 366 days);
+        vm.warp(block.timestamp + 365 days + 1);
         vm.prank(TOKEN_MINTER_ADDRESS);
         beetsToken.incrementYear();
 
@@ -106,7 +106,7 @@ contract BeetsTest is Test {
     function testMintInYearTwoNoFirstYearMints() public {
         uint256 maxAmountYearTwo = 20_000_000 ether;
 
-        vm.warp(block.timestamp + 366 days);
+        vm.warp(block.timestamp + 365 days + 1);
         vm.prank(TOKEN_MINTER_ADDRESS);
         beetsToken.incrementYear();
 
@@ -116,5 +116,38 @@ contract BeetsTest is Test {
         assertEq(beetsToken.balanceOf(TOKEN_MINTER_ADDRESS), maxAmountYearTwo);
         assertEq(beetsToken.totalSupply(), INITIAL_SUPPLY + maxAmountYearTwo);
         assertEq(beetsToken.getMaxAllowedSupplyCurrentYear(), INITIAL_SUPPLY + maxAmountYearTwo);
+    }
+
+    function testIncrementYear() public {
+        uint256 amountYearOne = 20_000_000 ether;
+        uint256 amountYearTwo = 10_000_000 ether;
+
+        vm.prank(TOKEN_MINTER_ADDRESS);
+        beetsToken.mint(TOKEN_MINTER_ADDRESS, amountYearOne);
+
+        vm.warp(block.timestamp + 365 days + 1);
+        vm.prank(TOKEN_MINTER_ADDRESS);
+        beetsToken.incrementYear();
+
+        assertEq(beetsToken.startTimestampCurrentYear(), block.timestamp - 1);
+        assertEq(beetsToken.amountMintedCurrentYear(), 0);
+        assertEq(beetsToken.startingSupplyCurrentYear(), INITIAL_SUPPLY + amountYearOne);
+
+        vm.prank(TOKEN_MINTER_ADDRESS);
+        beetsToken.mint(TOKEN_MINTER_ADDRESS, amountYearTwo);
+
+        assertEq(beetsToken.startTimestampCurrentYear(), block.timestamp - 1);
+        assertEq(beetsToken.amountMintedCurrentYear(), amountYearTwo);
+        assertEq(beetsToken.startingSupplyCurrentYear(), INITIAL_SUPPLY + amountYearOne);
+    }
+
+    function testIncrementYearNoMints() public {
+        vm.warp(block.timestamp + 365 days + 1);
+        vm.prank(TOKEN_MINTER_ADDRESS);
+        beetsToken.incrementYear();
+
+        assertEq(beetsToken.startTimestampCurrentYear(), block.timestamp - 1);
+        assertEq(beetsToken.amountMintedCurrentYear(), 0);
+        assertEq(beetsToken.startingSupplyCurrentYear(), INITIAL_SUPPLY);
     }
 }
