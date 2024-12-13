@@ -7,7 +7,7 @@ import {Ownable} from "openzeppelin-contracts/access/Ownable.sol";
 
 contract Beets is ERC20, ERC20Permit, Ownable {
     uint256 public constant YEAR_IN_SECONDS = 365 days;
-    // 10% per year is the hardcoded max inflation rate, as defined in BIP-##
+    // 10% per year is the hardcoded max inflation rate, as defined in BIP-77
     uint256 public constant MAX_INFLATION_PER_YEAR = 1e17;
 
     // The initial start timestamp is defined on deployment. This is the start time of the current year

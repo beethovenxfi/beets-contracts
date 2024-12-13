@@ -31,9 +31,8 @@ contract BeetsTest is Test {
         assertEq(beetsToken.totalSupply(), INITIAL_SUPPLY);
         assertEq(beetsToken.owner(), TOKEN_MINTER_ADDRESS);
         assertEq(beetsToken.startTimestampCurrentYear(), block.timestamp);
-        assertEq(beetsToken.startingSupplyCurrentYear(), INITIAL_SUPPLY);
         assertEq(beetsToken.amountMintedCurrentYear(), 0);
-        assertEq(beetsToken.getMaxAllowedSupplyCurrentYear(), 220_000_000 ether);
+        assertEq(beetsToken.maxAmountMintableCurrentYear(), MAX_MINTABLE_FIRST_YEAR);
         assertEq(beetsToken.balanceOf(TOKEN_MINTER_TARGET), INITIAL_SUPPLY);
         assertEq(beetsToken.getEndTimestampCurrentYear(), block.timestamp + 365 days);
     }
@@ -48,7 +47,7 @@ contract BeetsTest is Test {
         new Beets(INITIAL_SUPPLY, address(0));
     }
 
-    function testMint() public {
+    function testFullMint() public {
         uint256 amount = 1000 ether;
 
         vm.prank(TOKEN_MINTER_ADDRESS);
@@ -57,7 +56,7 @@ contract BeetsTest is Test {
         assertEq(beetsToken.balanceOf(TOKEN_MINTER_ADDRESS), amount);
         assertEq(beetsToken.amountMintedCurrentYear(), amount);
         assertEq(beetsToken.totalSupply(), INITIAL_SUPPLY + amount);
-        assertEq(beetsToken.getMaxAllowedSupplyCurrentYear(), 220_000_000 ether);
+        assertEq(beetsToken.maxAmountMintableCurrentYear(), MAX_MINTABLE_FIRST_YEAR);
     }
 
     function testMintUnAuthorized() public {
@@ -116,10 +115,10 @@ contract BeetsTest is Test {
 
         assertEq(beetsToken.balanceOf(TOKEN_MINTER_ADDRESS), maxAmountYearTwo);
         assertEq(beetsToken.totalSupply(), INITIAL_SUPPLY + maxAmountYearTwo);
-        assertEq(beetsToken.getMaxAllowedSupplyCurrentYear(), INITIAL_SUPPLY + maxAmountYearTwo);
+        assertEq(beetsToken.maxAmountMintableCurrentYear(), MAX_MINTABLE_FIRST_YEAR);
     }
 
-    function testIncrementYear() public {
+    function testIncrementYearWithMints() public {
         uint256 amountYearOne = 20_000_000 ether;
         uint256 amountYearTwo = 10_000_000 ether;
 
@@ -132,14 +131,14 @@ contract BeetsTest is Test {
 
         assertEq(beetsToken.startTimestampCurrentYear(), block.timestamp - 1);
         assertEq(beetsToken.amountMintedCurrentYear(), 0);
-        assertEq(beetsToken.startingSupplyCurrentYear(), INITIAL_SUPPLY + amountYearOne);
+        assertEq(beetsToken.maxAmountMintableCurrentYear(), 22_000_000 ether);
 
         vm.prank(TOKEN_MINTER_ADDRESS);
         beetsToken.mint(TOKEN_MINTER_ADDRESS, amountYearTwo);
 
         assertEq(beetsToken.startTimestampCurrentYear(), block.timestamp - 1);
         assertEq(beetsToken.amountMintedCurrentYear(), amountYearTwo);
-        assertEq(beetsToken.startingSupplyCurrentYear(), INITIAL_SUPPLY + amountYearOne);
+        assertEq(beetsToken.maxAmountMintableCurrentYear(), 22_000_000 ether);
     }
 
     function testIncrementYearNoMints() public {
@@ -149,7 +148,7 @@ contract BeetsTest is Test {
 
         assertEq(beetsToken.startTimestampCurrentYear(), block.timestamp - 1);
         assertEq(beetsToken.amountMintedCurrentYear(), 0);
-        assertEq(beetsToken.startingSupplyCurrentYear(), INITIAL_SUPPLY);
+        assertEq(beetsToken.maxAmountMintableCurrentYear(), MAX_MINTABLE_FIRST_YEAR);
     }
 
     function testIncrementYearNotEndedError() public {
