@@ -47,8 +47,9 @@ contract BeetsTest is Test {
         new Beets(INITIAL_SUPPLY, address(0));
     }
 
-    function testFullMint() public {
+    function testPartialMints() public {
         uint256 amount = 1000 ether;
+        uint256 amount2 = 100_000 ether;
 
         vm.prank(TOKEN_MINTER_ADDRESS);
         beetsToken.mint(TOKEN_MINTER_ADDRESS, amount);
@@ -57,6 +58,41 @@ contract BeetsTest is Test {
         assertEq(beetsToken.amountMintedCurrentYear(), amount);
         assertEq(beetsToken.totalSupply(), INITIAL_SUPPLY + amount);
         assertEq(beetsToken.maxAmountMintableCurrentYear(), MAX_MINTABLE_FIRST_YEAR);
+
+        vm.prank(TOKEN_MINTER_ADDRESS);
+        beetsToken.mint(TOKEN_MINTER_ADDRESS, amount2);
+
+        assertEq(beetsToken.balanceOf(TOKEN_MINTER_ADDRESS), amount + amount2);
+        assertEq(beetsToken.amountMintedCurrentYear(), amount + amount2);
+        assertEq(beetsToken.totalSupply(), INITIAL_SUPPLY + amount + amount2);
+        assertEq(beetsToken.maxAmountMintableCurrentYear(), MAX_MINTABLE_FIRST_YEAR);
+    }
+
+    function testMultiYearPartialMints() public {
+        uint256 amount = 250_000 ether;
+        uint256 amount2 = 750_000 ether;
+        uint256 amount3 = 10_000_000 ether;
+
+        vm.prank(TOKEN_MINTER_ADDRESS);
+        beetsToken.mint(TOKEN_MINTER_ADDRESS, amount);
+
+        vm.prank(TOKEN_MINTER_ADDRESS);
+        beetsToken.mint(TOKEN_MINTER_ADDRESS, amount2);
+
+        assertEq(beetsToken.totalSupply(), INITIAL_SUPPLY + amount + amount2);
+
+        vm.warp(block.timestamp + 366 days);
+
+        vm.prank(TOKEN_MINTER_ADDRESS);
+        beetsToken.incrementYear();
+
+        assertEq(beetsToken.startTimestampCurrentYear(), block.timestamp - 1 days);
+        assertEq(beetsToken.maxAmountMintableCurrentYear(), 20_100_000 ether);
+        assertEq(beetsToken.amountMintedCurrentYear(), 0);
+
+        vm.prank(TOKEN_MINTER_ADDRESS);
+        beetsToken.mint(TOKEN_MINTER_ADDRESS, amount3);
+        assertEq(beetsToken.amountMintedCurrentYear(), amount3);
     }
 
     function testMintUnAuthorized() public {
