@@ -17,9 +17,10 @@ contract Beets is ERC20, ERC20Permit, Ownable {
     // The amount of tokens we've minted so far for the current year
     uint256 public amountMintedCurrentYear;
 
-    // The starting supply is the total supply at the start of the current year, it's used to calculate the
-    // minting cap such that no more than 10% of the starting supply can be minted during the current year.
-    uint256 public startingSupplyCurrentYear;
+    // The max amount of beets that can be minted for the current year. At the start of the year, we take the current
+    // total supply and calculate the max amount of beets that can be minted for the current year as 10% of the
+    // current total supply.
+    uint256 public maxAmountMintableCurrentYear;
 
     error MintAmountTooHigh(uint256 remainingMintable);
     error CurrentYearHasNotEnded();
@@ -40,9 +41,9 @@ contract Beets is ERC20, ERC20Permit, Ownable {
         // The current year starts at the deployment timestamp
         startTimestampCurrentYear = block.timestamp;
 
-        startingSupplyCurrentYear = totalSupply();
-
         amountMintedCurrentYear = 0;
+
+        maxAmountMintableCurrentYear = (totalSupply() * MAX_INFLATION_PER_YEAR) / 1 ether;
     }
 
     function mint(address to, uint256 amount) public onlyOwner {
@@ -54,8 +55,10 @@ contract Beets is ERC20, ERC20Permit, Ownable {
 
         amountMintedCurrentYear += amount;
 
-        if (totalSupply() + amount > getMaxAllowedSupplyCurrentYear()) {
-            revert MintAmountTooHigh(getMaxAllowedSupplyCurrentYear() - totalSupply());
+        if (amountMintedCurrentYear > maxAmountMintableCurrentYear) {
+            uint256 remainingMintable = maxAmountMintableCurrentYear - (amountMintedCurrentYear - amount);
+
+            revert MintAmountTooHigh(remainingMintable);
         }
 
         _mint(to, amount);
@@ -77,16 +80,8 @@ contract Beets is ERC20, ERC20Permit, Ownable {
         // reset the amount minted for the current year
         amountMintedCurrentYear = 0;
 
-        // The starting supply is the current total supply
-        startingSupplyCurrentYear = totalSupply();
-    }
-
-    /**
-     * @notice Calculates the maximum allowed supply for the current year.
-     * @return The maximum allowed supply for the current year.
-     */
-    function getMaxAllowedSupplyCurrentYear() public view returns (uint256) {
-        return startingSupplyCurrentYear + (startingSupplyCurrentYear * MAX_INFLATION_PER_YEAR) / 1 ether;
+        // the max amount of beets that can be minted for the current year
+        maxAmountMintableCurrentYear = (totalSupply() * MAX_INFLATION_PER_YEAR) / 1 ether;
     }
 
     /**
