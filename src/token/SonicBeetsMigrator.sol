@@ -14,6 +14,11 @@ contract SonicBeetsMigrator {
 
     address public admin;
 
+    error UserBalanceInsufficient();
+    error MigratorBalanceInsufficient();
+    error MigrationDisabled();
+    error NotAdmin();
+
     constructor(IERC20 _OPERABEETS, IERC20 _SONICBEETS, address _TREASURY) {
         OPERABEETS = _OPERABEETS;
         SONICBEETS = _SONICBEETS;
@@ -22,43 +27,43 @@ contract SonicBeetsMigrator {
     }
 
     function exchangeOperaToSonic(uint256 amount) public {
-        require(operaToSonicEnabled, "ERR_MIGRATION_DISABLED");
-        require(OPERABEETS.balanceOf(msg.sender) >= amount, "ERR_INSUFFICIENT_BALANCE_USER");
-        require(SONICBEETS.balanceOf(address(this)) >= amount, "ERR_INSUFFICIENT_BALANCE");
+        require(operaToSonicEnabled, MigrationDisabled());
+        require(OPERABEETS.balanceOf(msg.sender) >= amount, UserBalanceInsufficient());
+        require(SONICBEETS.balanceOf(address(this)) >= amount, MigratorBalanceInsufficient());
         OPERABEETS.transferFrom(msg.sender, address(this), amount);
         SONICBEETS.transfer(msg.sender, amount);
     }
 
     function exchangeSonicToOpera(uint256 amount) public {
-        require(sonicToOperaEnabled, "ERR_MIGRATION_DISABLED");
-        require(SONICBEETS.balanceOf(msg.sender) >= amount, "ERR_INSUFFICIENT_BALANCE_USER");
-        require(OPERABEETS.balanceOf(address(this)) >= amount, "ERR_INSUFFICIENT_BALANCE");
+        require(sonicToOperaEnabled, MigrationDisabled());
+        require(SONICBEETS.balanceOf(msg.sender) >= amount, UserBalanceInsufficient());
+        require(OPERABEETS.balanceOf(address(this)) >= amount, MigratorBalanceInsufficient());
         SONICBEETS.transferFrom(msg.sender, address(this), amount);
         OPERABEETS.transfer(msg.sender, amount);
     }
 
     function setAdmin(address _admin) public {
-        require(msg.sender == admin, "ERR_NOT_ADMIN");
+        require(msg.sender == admin, NotAdmin());
         admin = _admin;
     }
 
     function enableOperaToSonic(bool _toggle) external {
-        require(msg.sender == admin, "ERR_NOT_ADMIN");
+        require(msg.sender == admin, NotAdmin());
         operaToSonicEnabled = _toggle;
     }
 
     function enableSonicToOpera(bool _toggle) external {
-        require(msg.sender == admin, "ERR_NOT_ADMIN");
+        require(msg.sender == admin, NotAdmin());
         sonicToOperaEnabled = _toggle;
     }
 
     function withdrawOperaBeets() public {
-        require(msg.sender == admin, "ERR_NOT_ADMIN");
+        require(msg.sender == admin, NotAdmin());
         OPERABEETS.transfer(TREASURY, OPERABEETS.balanceOf(address(this)));
     }
 
     function withdrawSonicBeets() public {
-        require(msg.sender == admin, "ERR_NOT_ADMIN");
+        require(msg.sender == admin, NotAdmin());
         SONICBEETS.transfer(TREASURY, SONICBEETS.balanceOf(address(this)));
     }
 }
