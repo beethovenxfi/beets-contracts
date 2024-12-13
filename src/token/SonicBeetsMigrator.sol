@@ -14,11 +14,7 @@ contract SonicBeetsMigrator {
 
     address public admin;
 
-    constructor(
-        IERC20 _OPERABEETS,
-        IERC20 _SONICBEETS,
-        address _TREASURY
-    ) {
+    constructor(IERC20 _OPERABEETS, IERC20 _SONICBEETS, address _TREASURY) {
         OPERABEETS = _OPERABEETS;
         SONICBEETS = _SONICBEETS;
         TREASURY = _TREASURY;
