@@ -27,14 +27,16 @@ contract Beets is ERC20, ERC20Permit, Ownable {
     error CurrentYearEnded();
     error InitialSupplyIsZero();
     error InititalMintTargetIsZero();
+    error OwnerIsZero();
 
-    constructor(uint256 _initialSupply, address _initialMintTarget)
+    constructor(uint256 _initialSupply, address _initialMintTarget, address _owner)
         ERC20("Beets", "BEETS")
         ERC20Permit("Beets")
         Ownable(msg.sender)
     {
         require(_initialSupply > 0, InitialSupplyIsZero());
         require(_initialMintTarget != address(0), InititalMintTargetIsZero());
+        require(_owner != address(0), OwnerIsZero());
 
         _mint(_initialMintTarget, _initialSupply);
 
@@ -44,6 +46,8 @@ contract Beets is ERC20, ERC20Permit, Ownable {
         amountMintedCurrentYear = 0;
 
         maxAmountMintableCurrentYear = (totalSupply() * MAX_INFLATION_PER_YEAR) / 1 ether;
+
+        transferOwnership(_owner);
     }
 
     function mint(address to, uint256 amount) public onlyOwner {

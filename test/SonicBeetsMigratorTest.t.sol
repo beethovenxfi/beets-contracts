@@ -23,8 +23,8 @@ contract SonicBeetsMigratorTest is Test {
     function setUp() public {
         sonicFork = vm.createSelectFork(SONIC_FORK_URL, INITIAL_FORK_BLOCK_NUMBER);
 
-        sonicBeets = new Beets(INITIAL_SUPPLY, address(this));
-        fantomBeets = new Beets(INITIAL_SUPPLY, address(this));
+        sonicBeets = new Beets(INITIAL_SUPPLY, address(this), address(this));
+        fantomBeets = new Beets(INITIAL_SUPPLY, address(this), address(this));
 
         sonicBeetsMigrator = new SonicBeetsMigrator(fantomBeets, sonicBeets, TREASURY);
 

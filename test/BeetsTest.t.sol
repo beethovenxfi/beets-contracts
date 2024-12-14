@@ -23,8 +23,7 @@ contract BeetsTest is Test {
     function setUp() public {
         sonicFork = vm.createSelectFork(SONIC_FORK_URL, INITIAL_FORK_BLOCK_NUMBER);
 
-        beetsToken = new Beets(INITIAL_SUPPLY, TOKEN_MINTER_TARGET);
-        beetsToken.transferOwnership(TOKEN_MINTER_ADDRESS);
+        beetsToken = new Beets(INITIAL_SUPPLY, TOKEN_MINTER_TARGET, TOKEN_MINTER_ADDRESS);
     }
 
     function testConstructor() public view {
@@ -39,12 +38,17 @@ contract BeetsTest is Test {
 
     function testConstructorErrorZeroSupply() public {
         vm.expectRevert(abi.encodeWithSelector(Beets.InitialSupplyIsZero.selector));
-        new Beets(0, TOKEN_MINTER_TARGET);
+        new Beets(0, TOKEN_MINTER_TARGET, address(this));
     }
 
     function testConstructorErrorZeroMintTarget() public {
         vm.expectRevert(abi.encodeWithSelector(Beets.InititalMintTargetIsZero.selector));
-        new Beets(INITIAL_SUPPLY, address(0));
+        new Beets(INITIAL_SUPPLY, address(0), address(this));
+    }
+
+    function testConstructorErrorZeroOwner() public {
+        vm.expectRevert(abi.encodeWithSelector(Beets.OwnerIsZero.selector));
+        new Beets(INITIAL_SUPPLY, TOKEN_MINTER_TARGET, address(0));
     }
 
     function testPartialMints() public {
