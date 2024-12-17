@@ -26,7 +26,7 @@ contract SonicBeetsMigrator {
         admin = msg.sender;
     }
 
-    function exchangeOperaToSonic(uint256 amount) public {
+    function exchangeOperaToSonic(uint256 amount) external {
         require(operaToSonicEnabled, MigrationDisabled());
         require(OPERABEETS.balanceOf(msg.sender) >= amount, UserBalanceInsufficient());
         require(SONICBEETS.balanceOf(address(this)) >= amount, MigratorBalanceInsufficient());
@@ -34,7 +34,7 @@ contract SonicBeetsMigrator {
         SONICBEETS.transfer(msg.sender, amount);
     }
 
-    function exchangeSonicToOpera(uint256 amount) public {
+    function exchangeSonicToOpera(uint256 amount) external {
         require(sonicToOperaEnabled, MigrationDisabled());
         require(SONICBEETS.balanceOf(msg.sender) >= amount, UserBalanceInsufficient());
         require(OPERABEETS.balanceOf(address(this)) >= amount, MigratorBalanceInsufficient());
@@ -42,7 +42,7 @@ contract SonicBeetsMigrator {
         OPERABEETS.transfer(msg.sender, amount);
     }
 
-    function setAdmin(address _admin) public {
+    function setAdmin(address _admin) external {
         require(msg.sender == admin, NotAdmin());
         admin = _admin;
     }
@@ -57,12 +57,12 @@ contract SonicBeetsMigrator {
         sonicToOperaEnabled = _toggle;
     }
 
-    function withdrawOperaBeets() public {
+    function withdrawOperaBeets() external {
         require(msg.sender == admin, NotAdmin());
         OPERABEETS.transfer(TREASURY, OPERABEETS.balanceOf(address(this)));
     }
 
-    function withdrawSonicBeets() public {
+    function withdrawSonicBeets() external {
         require(msg.sender == admin, NotAdmin());
         SONICBEETS.transfer(TREASURY, SONICBEETS.balanceOf(address(this)));
     }
