@@ -3,8 +3,9 @@
 pragma solidity ^0.8.0;
 
 import "openzeppelin-contracts/token/ERC20/IERC20.sol";
+import {ReentrancyGuard} from "openzeppelin-contracts/utils/ReentrancyGuard.sol";
 
-contract SonicBeetsMigrator {
+contract SonicBeetsMigrator is ReentrancyGuard {
     IERC20 public immutable OPERABEETS;
     IERC20 public immutable SONICBEETS;
     address public immutable TREASURY;
@@ -26,7 +27,7 @@ contract SonicBeetsMigrator {
         admin = msg.sender;
     }
 
-    function exchangeOperaToSonic(uint256 amount) public {
+    function exchangeOperaToSonic(uint256 amount) public nonReentrant {
         require(operaToSonicEnabled, MigrationDisabled());
         require(OPERABEETS.balanceOf(msg.sender) >= amount, UserBalanceInsufficient());
         require(SONICBEETS.balanceOf(address(this)) >= amount, MigratorBalanceInsufficient());
@@ -34,7 +35,7 @@ contract SonicBeetsMigrator {
         SONICBEETS.transfer(msg.sender, amount);
     }
 
-    function exchangeSonicToOpera(uint256 amount) public {
+    function exchangeSonicToOpera(uint256 amount) public nonReentrant {
         require(sonicToOperaEnabled, MigrationDisabled());
         require(SONICBEETS.balanceOf(msg.sender) >= amount, UserBalanceInsufficient());
         require(OPERABEETS.balanceOf(address(this)) >= amount, MigratorBalanceInsufficient());
