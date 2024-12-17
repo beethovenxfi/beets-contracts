@@ -27,6 +27,11 @@ contract SonicBeetsMigrator is ReentrancyGuard {
         admin = msg.sender;
     }
 
+    modifier onlyAdmin() {
+        require(msg.sender == admin, NotAdmin());
+        _;
+    }
+
     function exchangeOperaToSonic(uint256 amount) external nonReentrant {
         require(operaToSonicEnabled, MigrationDisabled());
         require(OPERABEETS.balanceOf(msg.sender) >= amount, UserBalanceInsufficient());
@@ -43,28 +48,23 @@ contract SonicBeetsMigrator is ReentrancyGuard {
         OPERABEETS.transfer(msg.sender, amount);
     }
 
-    function setAdmin(address _admin) external {
-        require(msg.sender == admin, NotAdmin());
+    function setAdmin(address _admin) external onlyAdmin {
         admin = _admin;
     }
 
-    function enableOperaToSonic(bool _toggle) external {
-        require(msg.sender == admin, NotAdmin());
+    function enableOperaToSonic(bool _toggle) external onlyAdmin {
         operaToSonicEnabled = _toggle;
     }
 
-    function enableSonicToOpera(bool _toggle) external {
-        require(msg.sender == admin, NotAdmin());
+    function enableSonicToOpera(bool _toggle) external onlyAdmin {
         sonicToOperaEnabled = _toggle;
     }
 
-    function withdrawOperaBeets() external {
-        require(msg.sender == admin, NotAdmin());
+    function withdrawOperaBeets() external onlyAdmin {
         OPERABEETS.transfer(TREASURY, OPERABEETS.balanceOf(address(this)));
     }
 
-    function withdrawSonicBeets() external {
-        require(msg.sender == admin, NotAdmin());
+    function withdrawSonicBeets() external onlyAdmin {
         SONICBEETS.transfer(TREASURY, SONICBEETS.balanceOf(address(this)));
     }
 }
