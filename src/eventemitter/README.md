@@ -4,6 +4,8 @@ This contract is copied here from the [balancer subgraph repo](https://github.co
 
 The goal of this contract is to send events that can be picked up by subgraphs in order to faciliate operational tasks.
 
+Deployed [here](https://sonicscan.org/address/0xe0F1dfAe777bB7D44d3cb7D8FCDce6731165211E#writeContract)
+
 ## Event identifiers and signatures
 
 | Name                 | Identifier                                                         | Message                                                           | Value                                                                    | Description                                                                                  |
