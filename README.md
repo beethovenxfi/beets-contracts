@@ -1,66 +1,17 @@
-## Foundry
+# Contracts in use by BEETS
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+## Beets (token)
 
-Foundry consists of:
+The Beets token that has built in minting capabilities and a max 10% mint cap per year.
 
--   **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
--   **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
--   **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
--   **Chisel**: Fast, utilitarian, and verbose solidity REPL.
+## SonicBeetsMigrator
 
-## Documentation
+The migration contract that facilitates operaBEETS <> sonicBEETS migraton on Sonic.
 
-https://book.getfoundry.sh/
+## Gauges
 
-## Usage
+Balancer gauges to facilitate liquidity mining rewards on Sonic.
 
-### Build
+## Event emitter
 
-```shell
-$ forge build
-```
-
-### Test
-
-```shell
-$ forge test
-```
-
-### Format
-
-```shell
-$ forge fmt
-```
-
-### Gas Snapshots
-
-```shell
-$ forge snapshot
-```
-
-### Anvil
-
-```shell
-$ anvil
-```
-
-### Deploy
-
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
-```
-
-### Cast
-
-```shell
-$ cast <subcommand>
-```
-
-### Help
-
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
-```
+Emits events to supplemen subgraph.
