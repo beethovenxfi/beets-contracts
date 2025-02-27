@@ -19,7 +19,7 @@ contract OgMaBeets is ERC721Enumerable, Ownable {
     mapping(uint256 => OgPositionInfo) private _positionForId;
 
     /**
-     * @dev Constructs and initializes the contract..
+     * @dev Constructs and initializes the contract.
      */
     constructor() ERC721("OG maBeets position", "OGmaBEETS") Ownable(msg.sender) {
         _tokenURI = "https://beethoven-assets.s3.eu-central-1.amazonaws.com/og-mabeets.png";
