@@ -108,7 +108,7 @@ contract OgMaBeetsTest is Test {
         assertEq(position1.level, level1);
         assertEq(ogNftContract.ownerOf(id1), owner1);
         assertEq(ogNftContract.totalSupply(), 1);
-        assertEq(ogNftContract.tokenURI(1), "https://beethoven-assets.s3.eu-central-1.amazonaws.com/og-relic-nft.png");
+        assertEq(ogNftContract.tokenURI(1), "https://beethoven-assets.s3.eu-central-1.amazonaws.com/og-mabeets.png");
 
         ogNftContract.setTokenURI("https://beethoven-assets.s3.eu-central-1.amazonaws.com/og-relic-nft2.png");
         assertEq(ogNftContract.tokenURI(1), "https://beethoven-assets.s3.eu-central-1.amazonaws.com/og-relic-nft2.png");
