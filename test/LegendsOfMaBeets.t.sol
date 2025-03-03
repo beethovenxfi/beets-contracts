@@ -4,6 +4,7 @@ pragma solidity ^0.8.27;
 import {Test, console} from "forge-std/Test.sol";
 import {LegendsOfMaBeets} from "src/legends-of-mabeets/LegendsOfMaBeets.sol";
 import {NftDescriptor} from "src/legends-of-mabeets/NftDescriptor.sol";
+import {LevelNftDescriptor} from "src/legends-of-mabeets/LevelNftDescriptor.sol";
 
 contract LegendsOfMaBeetsTest is Test {
     string SONIC_FORK_URL = "https://rpc.soniclabs.com";
@@ -125,14 +126,26 @@ contract LegendsOfMaBeetsTest is Test {
     }
 
     function testSetNFTDescriptor() public {
-        NftDescriptor newDescriptor = new NftDescriptor(lomNftContract);
+        uint256 amount = 100 ether;
+        uint256 level = 10;
+
+        address owner = vm.addr(1);
+
+        uint256 id = lomNftContract.mint(owner, level, amount);
+        string memory tokenURI = lomNftContract.tokenURI(id);
+        assertEq(tokenURI, "https://beethoven-assets.s3.eu-central-1.amazonaws.com/mabeets-legends.png");
+
+        LevelNftDescriptor newDescriptor = new LevelNftDescriptor(lomNftContract);
         lomNftContract.setNFTDescriptor(newDescriptor);
 
         assertEq(address(lomNftContract.nftDescriptor()), address(newDescriptor));
+        assertEq(
+            lomNftContract.tokenURI(id), "https://beethoven-assets.s3.eu-central-1.amazonaws.com/mabeets-legends/10.png"
+        );
     }
 
     function testSetNFTDescriptorOnlyOwner() public {
-        NftDescriptor newDescriptor = new NftDescriptor(lomNftContract);
+        LevelNftDescriptor newDescriptor = new LevelNftDescriptor(lomNftContract);
         address user = vm.addr(1);
 
         vm.prank(user);
