@@ -26,8 +26,11 @@ contract LegendsOfMaBeets is ERC721Enumerable, Ownable {
 
     /**
      * @dev Constructs and initializes the contract.
+     * @param descriptor The NFTDescriptor contract to use for tokenURI.
      */
-    constructor() ERC721("Legends of maBeets", "LOM") Ownable(msg.sender) {}
+    constructor(INFTDescriptor descriptor) ERC721("Legends of maBeets", "LOM") Ownable(msg.sender) {
+        nftDescriptor = descriptor;
+    }
 
     /**
      * @notice Mints a new NFT to the user with the supplied level and amount.
@@ -61,8 +64,9 @@ contract LegendsOfMaBeets is ERC721Enumerable, Ownable {
      * @param tokenId The NFT ID of the position to get the tokenURI for.
      */
     function tokenURI(uint256 tokenId) public view override(ERC721) returns (string memory) {
-        if (getPositionForId(tokenId).amount == 0) revert NonExistentToken();
-        return nftDescriptor.constructTokenURI(tokenId);
+        PositionInfo memory position = getPositionForId(tokenId);
+        if (position.amount == 0) revert NonExistentToken();
+        return nftDescriptor.constructTokenURI(position);
     }
 
     /// @dev Increments the ID nonce and mints a new Relic to `to`.

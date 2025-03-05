@@ -18,9 +18,9 @@ contract LegendsOfMaBeetsTest is Test {
     function setUp() public {
         sonicFork = vm.createSelectFork(SONIC_FORK_URL, INITIAL_FORK_BLOCK_NUMBER);
 
-        lomNftContract = new LegendsOfMaBeets();
-        NftDescriptor lomNftDescriptor = new NftDescriptor(lomNftContract);
-        lomNftContract.setNFTDescriptor(lomNftDescriptor);
+        NftDescriptor lomNftDescriptor = new NftDescriptor();
+        lomNftContract = new LegendsOfMaBeets(lomNftDescriptor);
+        // lomNftContract.setNFTDescriptor(lomNftDescriptor);
     }
 
     function testConstructor() public view {
@@ -135,7 +135,7 @@ contract LegendsOfMaBeetsTest is Test {
         string memory tokenURI = lomNftContract.tokenURI(id);
         assertEq(tokenURI, "https://beethoven-assets.s3.eu-central-1.amazonaws.com/mabeets-legends.png");
 
-        LevelNftDescriptor newDescriptor = new LevelNftDescriptor(lomNftContract);
+        LevelNftDescriptor newDescriptor = new LevelNftDescriptor();
         lomNftContract.setNFTDescriptor(newDescriptor);
 
         assertEq(address(lomNftContract.nftDescriptor()), address(newDescriptor));
@@ -145,7 +145,7 @@ contract LegendsOfMaBeetsTest is Test {
     }
 
     function testSetNFTDescriptorOnlyOwner() public {
-        LevelNftDescriptor newDescriptor = new LevelNftDescriptor(lomNftContract);
+        LevelNftDescriptor newDescriptor = new LevelNftDescriptor();
         address user = vm.addr(1);
 
         vm.prank(user);

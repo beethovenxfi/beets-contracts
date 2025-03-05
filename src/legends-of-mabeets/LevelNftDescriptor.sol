@@ -12,13 +12,15 @@ contract LevelNftDescriptor is INFTDescriptor {
 
     LegendsOfMaBeets public immutable legendsContract;
 
-    constructor(LegendsOfMaBeets lom) {
-        legendsContract = lom;
-    }
+    constructor() {}
 
     /// @notice Returns a link to the stored image
-    function constructTokenURI(uint256 tokenId) external view override returns (string memory uri) {
-        LegendsOfMaBeets.PositionInfo memory position = legendsContract.getPositionForId(tokenId);
+    function constructTokenURI(LegendsOfMaBeets.PositionInfo calldata position)
+        external
+        view
+        override
+        returns (string memory uri)
+    {
         uri = string.concat(S3, position.level.toString(), ".png");
     }
 }
