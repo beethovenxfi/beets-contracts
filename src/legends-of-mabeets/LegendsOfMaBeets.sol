@@ -45,6 +45,22 @@ contract LegendsOfMaBeets is ERC721Enumerable, Ownable {
         position.level = level;
     }
 
+    /**
+     * @notice Mints many new NFTs.
+     * @param to The user addresses to mint the NFT to.
+     * @param level The levels of the legacy maBeets position.
+     * @param amount The amounts of the legacy maBeets position.
+     */
+    function mintMany(address[] calldata to, uint256[] calldata level, uint256[] calldata amount) public onlyOwner {
+        require(to.length == level.length && to.length == amount.length, "Arrays must be the same length");
+        uint256 id = 0;
+        for (uint256 i = 0; i < to.length; i++) {
+            id = _mint(to[i]);
+            _positionForId[id].amount = amount[i];
+            _positionForId[id].level = level[i];
+        }
+    }
+
     /// @notice Returns a PositionInfo object for the given id.
     function getPositionForId(uint256 id) public view returns (PositionInfo memory position) {
         position = _positionForId[id];

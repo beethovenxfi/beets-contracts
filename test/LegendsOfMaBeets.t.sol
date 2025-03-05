@@ -79,6 +79,53 @@ contract LegendsOfMaBeetsTest is Test {
         assertEq(lomNftContract.totalSupply(), 3);
     }
 
+    function testMintMany() public {
+        uint256 amount1 = 100 ether;
+        uint256 level1 = 10;
+        uint256 amount2 = 200 ether;
+        uint256 level2 = 5;
+        uint256 amount3 = 120 ether;
+        uint256 level3 = 3;
+
+        address owner1 = vm.addr(1);
+        address owner2 = vm.addr(2);
+
+        address[] memory owners = new address[](3);
+        owners[0] = owner1;
+        owners[1] = owner1;
+        owners[2] = owner2;
+
+        uint256[] memory levels = new uint256[](3);
+        levels[0] = level1;
+        levels[1] = level2;
+        levels[2] = level3;
+
+        uint256[] memory amounts = new uint256[](3);
+        amounts[0] = amount1;
+        amounts[1] = amount2;
+        amounts[2] = amount3;
+
+        lomNftContract.mintMany(owners, levels, amounts);
+        LegendsOfMaBeets.PositionInfo memory position1 = lomNftContract.getPositionForId(1);
+
+        assertEq(position1.amount, amount1);
+        assertEq(position1.level, level1);
+        assertEq(lomNftContract.ownerOf(1), owner1);
+        assertEq(lomNftContract.totalSupply(), 3);
+
+        LegendsOfMaBeets.PositionInfo memory position2 = lomNftContract.getPositionForId(2);
+
+        assertEq(position2.amount, amount2);
+        assertEq(position2.level, level2);
+        assertEq(lomNftContract.ownerOf(2), owner1);
+
+        LegendsOfMaBeets.PositionInfo memory position3 = lomNftContract.getPositionForId(3);
+
+        assertEq(position3.amount, amount3);
+        assertEq(position3.level, level3);
+        assertEq(lomNftContract.ownerOf(3), owner2);
+    }
+
     function testTransfer() public {
         uint256 amount1 = 100 ether;
         uint256 level1 = 10;
