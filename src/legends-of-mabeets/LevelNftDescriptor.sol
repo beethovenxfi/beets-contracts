@@ -8,7 +8,7 @@ import "./LegendsOfMaBeets.sol";
 contract LevelNftDescriptor is INFTDescriptor {
     using Strings for uint256;
 
-    string private constant S3 = "https://beethoven-assets.s3.eu-central-1.amazonaws.com/mabeets-legends/";
+    string private constant S3 = "https://beethoven-assets.s3.eu-central-1.amazonaws.com/lom/";
 
     LegendsOfMaBeets public immutable legendsContract;
 
